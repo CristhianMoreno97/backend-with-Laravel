@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:latest
+    ports:
+      - '3306:3306'
+    restart: always
+    environment:
+      MYSQL_DATABASE: apiRestFul-laravel
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/dbapass
+      MYSQL_PASSWORD_FILE: /run/secrets/dbapass
+    secrets:
+      - dbapass
+    volumes:
+      - ./dump:/docker-entrypoint-initdb.d
+      - ./conf:/etc/mysql/conf.d
+      - persistent:/var/lib/mysql
+    networks:
+      - php-apps
+
+secrets:
+  dbapass:
+    file: dbpass.txt
+
+networks:
+  php-apps:
+    driver: bridge
+
+volumes:
+  persistent:
