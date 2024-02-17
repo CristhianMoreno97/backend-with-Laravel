@@ -21,16 +21,13 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::group(
-    [
-        'prefix' => 'v1', 
-        'namespace' => 'App\Http\Controllers'
-    ], 
-    function(){
+Route::middleware('jwt.verify')->group(function () {
+    Route::prefix('v1')->namespace('App\Http\Controllers')->group(function () {
         Route::apiResource('customers', CustomerController::class);
         Route::apiResource('invoices', InvoiceController::class);
-    }
-);
+    });
+});
+
 
 Route::group([
 
