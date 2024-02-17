@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\InvoiceController;
 use Illuminate\Http\Request;
@@ -30,3 +31,16 @@ Route::group(
         Route::apiResource('invoices', InvoiceController::class);
     }
 );
+
+Route::group([
+
+    'middleware' => 'api',
+    'prefix' => 'v1/auth'
+
+], function ($router) {
+
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('logout', [AuthController::class, 'logout']);
+    Route::post('refresh', [AuthController::class, 'refresh']);
+    Route::post('me', [AuthController::class, 'me']);
+});
