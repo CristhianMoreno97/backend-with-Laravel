@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\RefreshToken;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -25,13 +26,13 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+            return ApiResponse::send(null, $validator->errors(), 422);
         }
 
         $credentials = $validator->validated();
 
         if (!$token = auth()->attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return ApiResponse::send(null, 'Credentials are invalid', 401);
         }
         
         RefreshToken::where('user_id', auth()->id())->delete();
@@ -55,7 +56,7 @@ class AuthController extends Controller
      */
     public function me()
     {
-        return response()->json(auth()->user());
+        return ApiResponse::send(auth()->user(), 'Success', 200);
     }
 
     /**
@@ -67,7 +68,7 @@ class AuthController extends Controller
     {
         auth()->logout();
 
-        return response()->json(['message' => 'Successfully logged out']);
+        return ApiResponse::send(null, 'Successfully logged out', 200);
     }
 
     /**
@@ -80,24 +81,24 @@ class AuthController extends Controller
         $refreshToken = request('refresh_token');
 
         if (!$refreshToken) {
-            return response()->json(['error' => 'No refresh token provided'], 401);
+            return ApiResponse::send(null, 'No refresh token provided', 401);
         }
 
         $hashRefreshToken = hash('sha256', $refreshToken);
         $tokenRecord = RefreshToken::where('token', $hashRefreshToken)->first();
 
         if (!$tokenRecord) {
-            return response()->json(['error' => 'Refresh token is invalid'], 401);
+            return ApiResponse::send(null, 'Refresh token is invalid', 401);
         }
         
         if ($tokenRecord->expires_at < now()) {
-            return response()->json(['error' => 'Refresh token is expired'], 401);
+            return ApiResponse::send(null, 'Refresh token is expired', 401);
         }
 
         $user = User::find($tokenRecord->user_id);
 
         if (!$user) {
-            return response()->json(['error' => 'User not found'], 404);
+            return ApiResponse::send(null, 'User not found', 404);
         }
 
         $newAccessToken = auth()->login($user);
@@ -118,12 +119,12 @@ class AuthController extends Controller
      */
     protected function respondWithToken($token, $refreshToken)
     {
-        return response()->json([
+        return ApiResponse::send([
             'access_token' => $token,
             'token_type' => 'bearer',
             'refresh_token' => $refreshToken,
             'expires_in' => auth()->factory()->getTTL() * 60
-        ]);
+        ], 'Success', 200);
     }
 
 
@@ -137,7 +138,7 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+            return ApiResponse::send(null, $validator->errors(), 422);
         }
 
         $user = User::create(array_merge(
@@ -145,9 +146,6 @@ class AuthController extends Controller
             ['password' => bcrypt($request->password)]
         ));
 
-        return response()->json([
-            'message' => 'User successfully registered',
-            'user' => $user
-        ], 201);
+        return ApiResponse::send($user, 'User successfully registered', 201);
     }
 }

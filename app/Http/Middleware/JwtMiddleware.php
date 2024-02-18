@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Http\Responses\ApiResponse;
 use Closure;
 use Exception;
 use Illuminate\Http\Request;
@@ -23,12 +24,12 @@ class JwtMiddleware
             JWTAuth::parseToken()->authenticate();
         } catch (Exception $e) {
             if ($e instanceof TokenInvalidException) {
-                return response()->json(['status' => 'Token is Invalid'], 401);
+                return ApiResponse::send(null, 'Token is Invalid', 401);
             }
             if ($e instanceof TokenExpiredException) {
-                return response()->json(['status' => 'Token is Expired'], 401);
+                return ApiResponse::send(null, 'Token is Expired', 401);
             }
-            return response()->json(['status' => 'Authorization Token not found'], 401);
+            return ApiResponse::send(null, 'Authorization Token not found', 401);
         }
         return $next($request);
     }
