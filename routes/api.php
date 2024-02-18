@@ -23,6 +23,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::middleware('jwt.verify')->group(function () {
     Route::prefix('v1')->namespace('App\Http\Controllers')->group(function () {
+        Route::post('auth/me', [AuthController::class, 'me']);
+        Route::post('auth/logout', [AuthController::class, 'logout']);
         Route::apiResource('customers', CustomerController::class);
         Route::apiResource('invoices', InvoiceController::class);
     });
@@ -37,8 +39,7 @@ Route::group([
 ], function ($router) {
 
     Route::post('login', [AuthController::class, 'login']);
-    Route::post('logout', [AuthController::class, 'logout']);
     Route::post('refresh', [AuthController::class, 'refresh']);
-    Route::post('me', [AuthController::class, 'me']);
     Route::post('register', [AuthController::class, 'register']);
+
 });
