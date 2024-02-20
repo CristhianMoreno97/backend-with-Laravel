@@ -76,9 +76,9 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function refresh()
+    public function refresh(Request $request)
     {
-        $refreshToken = request('refresh_token');
+        $refreshToken = $request->cookie('refreshToken');
 
         if (!$refreshToken) {
             return ApiResponse::send(null, 'No refresh token provided', 401);
@@ -103,13 +103,8 @@ class AuthController extends Controller
 
         $newAccessToken = auth()->login($user);
 
-        $newRefreshToken = Str::random(64);
-        $tokenRecord->token = hash('sha256', $newRefreshToken);
-        $tokenRecord->save();
-
-        return $this->respondWithToken($newAccessToken, $newRefreshToken);
+        return $this->respondWithToken($newAccessToken);
     }
-
     /**
      * Get the token array structure.
      *
@@ -117,14 +112,20 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function respondWithToken($token, $refreshToken)
+    protected function respondWithToken($token, $refreshToken = null)
     {
-        return ApiResponse::send([
+        $response = [
             'access_token' => $token,
             'token_type' => 'bearer',
-            'refresh_token' => $refreshToken,
             'expires_in' => auth()->factory()->getTTL() * 60
-        ], 'Success', 200);
+        ];
+    
+        if ($refreshToken) {
+            $cookie = cookie('refreshToken', $refreshToken, 60 * 24 * 7, "/", null, null, true, false, 'Lax');
+            return ApiResponse::send($response, 'Success', 200, $cookie);
+        }
+    
+        return ApiResponse::send($response, 'Success', 200);
     }
 
 
