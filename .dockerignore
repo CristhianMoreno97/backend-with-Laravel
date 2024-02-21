@@ -1,0 +1,21 @@
+/.git*
+/.idea/workspace.xml
+.dockerignore
+
+### Other data
+vendor/
+dbpass.txt
+storage/mysql-data
+
+### Vendor bin dependencies
+/tools/*/vendor/
+.phpunit.cache
+.phpunit.result.cache
+
+### Docker
+.docker/
+Dockerfile
+docker-compose.yml
+docker-compose-test-ci.yml
+docker-compose-staging.yml
+docker-compose-prod.yml
