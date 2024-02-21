@@ -1,8 +1,12 @@
 version: '3.8'
 
 services:
+
+  ####################################################################################################
+  # DATABASE (MySQL)
+  ####################################################################################################
   db:
-    image: mysql:latest
+    image: mysql:8.1
     ports:
       - '3306:3306'
     restart: always
@@ -13,8 +17,9 @@ services:
     secrets:
       - dbapass
     volumes:
-      - ./dump:/docker-entrypoint-initdb.d
-      - ./conf:/etc/mysql/conf.d
+      #- ./dump:/docker-entrypoint-initdb.d
+      #- ./conf:/etc/mysql/conf.d
+      - .docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
       - persistent:/var/lib/mysql
     networks:
       - php-apps
