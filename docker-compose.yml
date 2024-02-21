@@ -24,6 +24,34 @@ services:
     networks:
       - php-apps
 
+  ####################################################################################################
+  # phpMyAdmin
+  ####################################################################################################
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - 8080:80
+    environment:
+      - MYSQL_USER=root
+      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/dbapass
+      - MYSQL_PASSWORD_FILE=/run/secrets/dbapass
+    networks:
+      - php-apps
+
+  ####################################################################################################
+  # Laravel App
+  ####################################################################################################
+  app:
+    build:
+      context: .docker/php-apache
+      dockerfile: Dockerfile
+    ports:
+      - '80:80'
+    volumes:
+      - .:/var/www/html:cached
+    networks:
+      - php-apps
+
 secrets:
   dbapass:
     file: dbpass.txt
