@@ -68,11 +68,15 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 # Installation Guide
 
 1. Clone the repository
+4. Copy the `.env.example` file to `.env` and update the database credentials
 2. Run `docker-compose up -d` to start the containers
 3. Run `docker-compose exec app composer install` to install the dependencies
-4. Run `docker-compose exec app php artisan key:generate` to generate the application key
-5. Run `docker-compose exec app php artisan migrate` to run the migrations
-6. Run `docker-compose exec app php artisan db:seed` to seed the database
+5. Run `docker-compose exec app php artisan jtw:secret` to generate the jwt secret
+7. Run `docker-compose exec app php artisan key:generate` to generate the application key
+6. Run `docker-compose restart app` to restart the app container
+7. Run `docker-compose exec app php artisan migrate` to run the migrations
+8. Run `docker-compose exec app php artisan db:seed` to seed the database
+
 
 
 
