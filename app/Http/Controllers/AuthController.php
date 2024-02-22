@@ -121,7 +121,7 @@ class AuthController extends Controller
         ];
     
         if ($refreshToken) {
-            $cookie = cookie('refreshToken', $refreshToken, 60 * 24 * 7, "/", null, null, true, false, 'Lax');
+            $cookie = cookie('refreshToken', $refreshToken, 60 * 24 * 7, "/", null, true, true, false, 'None');
             return ApiResponse::send($response, 'Success', 200, $cookie);
         }
     
